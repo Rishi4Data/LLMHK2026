@@ -24,7 +24,8 @@ class RAGBase:
         instructions=INSTRUCTIONS,
         prompt_template=PROMPT_TEMPLATE,
         course='llm-zoomcamp',
-        model='gpt-5.4-mini'
+        model='gpt-5.4-mini',
+         api_type='openai'
     ):
         self.index = index
         self.llm_client = llm_client
@@ -32,6 +33,7 @@ class RAGBase:
         self.course = course
         self.prompt_template = prompt_template
         self.model = model
+        self.api_type = api_type
 
     def search(self, query, num_results=5):
         boost_dict = {'question': 3.0, 'section': 0.5}
@@ -62,17 +64,31 @@ class RAGBase:
         )
 
     def llm(self, prompt):
-        input_messages = [
-            {'role': 'developer', 'content': self.instructions},
-            {'role': 'user', 'content': prompt}
-        ]
+        if self.api_type == 'openai':
+            input_messages = [
+                {'role': 'developer', 'content': self.instructions},
+                {'role': 'user', 'content': prompt}
+            ]   
+        
+            response = self.llm_client.responses.create(
+                model=self.model,
+                input=input_messages
+            )
 
-        response = self.llm_client.responses.create(
-            model=self.model,
-            input=input_messages
-        )
+            return response.output_text
 
-        return response.output_text
+        elif self.api_type == 'groq':
+            groq_messages = [
+                {'role': 'system', 'content': self.instructions},
+                {'role': 'user', 'content': prompt}
+            ]
+
+            response = self.llm_client.chat.completions.create(
+                model=self.model,
+                messages=groq_messages
+            )
+
+            return response.choices[0].message.content
 
     def rag(self, query):
         search_results = self.search(query)
