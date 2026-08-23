@@ -1,6 +1,6 @@
 import requests
 from minsearch import Index
-from sqllite_utils import create_connection, create_table, insert_documents
+
 
 def load_faq_data():
     docs_url = "https://datatalks.club/faq/json/courses.json"
