@@ -25,7 +25,7 @@ class RAGBase:
         prompt_template=PROMPT_TEMPLATE,
         course='llm-zoomcamp',
         model='gpt-5.4-mini',
-         api_type='openai'
+        api_type='openai'
     ):
         self.index = index
         self.llm_client = llm_client
